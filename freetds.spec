@@ -17,7 +17,8 @@ Version:	0.60
 Release:	1
 License:	LGPL
 Group:		Libraries
-Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tgz
+Source0:	http://ibiblio.org/pub/Linux/ALPHA/freetds/old/%{name}-%{version}.tgz
+# Source0-md5:	bf719c9e1a5f8cd080dec6f9664e7f44
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
 BuildRequires:	glib-devel
