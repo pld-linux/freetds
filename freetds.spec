@@ -1,3 +1,4 @@
+#
 # Conditional build:
 # _with_msdblib - use MS-style dblib
 #
@@ -14,13 +15,16 @@ Summary:	Free implementation of Sybase's db-lib
 Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
 Name:		freetds
 Version:	0.60
-Release:	1
+Release:	2
 License:	LGPL
 Group:		Libraries
 Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tgz
+Patch0:		%{name}-nolibnsl.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	glib-devel
+BuildRequires:	libtool
 BuildRequires:	unixODBC-devel
 Requires(post):	/sbin/ldconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -68,9 +72,13 @@ Statyczne biblioteki FreeTDS.
 
 %prep
 %setup -q
+%patch -p1
 
 %build
+%{__libtoolize}
+%{__aclocal}
 %{__autoconf}
+%{__automake}
 %configure \
 	--with-tdsver=%{tdsver} \
 	%{?_with_msdblib:--with-msdblib} \

@@ -1,0 +1,13 @@
+--- freetds-0.60/configure.in.orig	Tue Sep 10 20:58:13 2002
++++ freetds-0.60/configure.in	Sun Mar  2 19:00:13 2003
+@@ -25,8 +25,8 @@
+ dnl ------------------------------------------------------------
+ dnl Checks for libraries.
+ dnl ------------------------------------------------------------
+-AC_CHECK_LIB(socket, socket, NETWORK_LIBS="$NETWORK_LIBS -lsocket")
+-AC_CHECK_LIB(nsl, gethostbyname, NETWORK_LIBS="$NETWORK_LIBS -lnsl")
++AC_CHECK_FUNC(socket,,[AC_CHECK_LIB(socket, socket, NETWORK_LIBS="$NETWORK_LIBS -lsocket")])
++AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl, gethostbyname, NETWORK_LIBS="$NETWORK_LIBS -lnsl")])
+ AC_SUBST(NETWORK_LIBS)
+ 
+ dnl ------------------------------------------------------------
