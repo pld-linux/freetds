@@ -67,7 +67,7 @@ Statyczne biblioteki FreeTDS.
 %setup -q
 
 %build
-autoconf
+%{__autoconf}
 %configure \
 	--with-tdsver=%{tdsver} \
 	%{?_with_msdblib:--with-msdblib} \
