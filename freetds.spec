@@ -19,6 +19,7 @@ Release:	2
 License:	LGPL
 Group:		Libraries
 Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tgz
+# Source0-md5: 15cc9829beb534606deb3020b3118eb9
 Patch0:		%{name}-nolibnsl.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
