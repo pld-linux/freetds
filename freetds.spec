@@ -1,5 +1,6 @@
+#
 # Conditional build:
-# _with_msdblib - use MS-style dblib
+%bcond_with	msdblib		# use MS-style dblib
 #
 # %%define tdsver - protocol version; valid versions:
 # 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
@@ -13,15 +14,16 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.60
+Version:	0.62.4
 Release:	1
 License:	LGPL
 Group:		Libraries
-Source0:	http://ibiblio.org/pub/Linux/ALPHA/freetds/old/%{name}-%{version}.tgz
-# Source0-md5:	bf719c9e1a5f8cd080dec6f9664e7f44
+Source0:	http://ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
+# Source0-md5:	09695686e7aa2eaf963c2ebe30c7ae74
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
-BuildRequires:	glib-devel
+BuildRequires:	libltdl-devel
+BuildRequires:	libtool
 BuildRequires:	unixODBC-devel
 Requires(post):	/sbin/ldconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -74,7 +76,7 @@ Statyczne biblioteki FreeTDS.
 %{__autoconf}
 %configure \
 	--with-tdsver=%{tdsver} \
-	%{?_with_msdblib:--with-msdblib} \
+	%{?with_msdblib:--with-msdblib} \
 	--with-unixodbc
 
 %{__make}
@@ -98,7 +100,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS ChangeLog README* TODO
+%doc AUTHORS BUGS ChangeLog NEWS README* TODO
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
 %attr(755,root,root) %{_bindir}/*
 %dir %{_sysconfdir}
