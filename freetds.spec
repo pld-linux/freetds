@@ -106,6 +106,7 @@ fi
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/freetds.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/locales.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/pool.conf
 %{_mandir}/man1/*
 
 %files devel
