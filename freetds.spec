@@ -81,8 +81,6 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT \
 	ETC=$RPM_BUILD_ROOT%{_sysconfdir}
 
-gzip -9nf AUTHORS BUGS NEWS README TODO
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -91,7 +89,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc *.gz
+%doc AUTHORS BUGS NEWS README TODO
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/freetds.conf
 
