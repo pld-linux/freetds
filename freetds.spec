@@ -108,7 +108,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS* ChangeLog README* TODO*
+%doc AUTHORS BUGS* ChangeLog NEWS README* TODO*
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
 %attr(755,root,root) %{_bindir}/*
 %dir %{_sysconfdir}
