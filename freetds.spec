@@ -93,6 +93,10 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT \
 	ETC=$RPM_BUILD_ROOT%{_sysconfdir}
 
+mv -f src/pool/BUGS BUGS.pool
+mv -f src/pool/README README.pool
+mv -f src/pool/TODO TODO.pool
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -106,12 +110,13 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS ChangeLog README* TODO
+%doc AUTHORS BUGS* ChangeLog README* TODO*
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
 %attr(755,root,root) %{_bindir}/*
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/freetds.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/locales.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/pool.conf
 %{_mandir}/man1/*
 
 %files devel
