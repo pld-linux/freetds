@@ -1,6 +1,6 @@
 #
 # Conditional build:
-# _with_msdblib - use MS-style dblib
+%bcond_with	msdblib		# use MS-style dblib
 #
 # %%define tdsver - protocol version; valid versions:
 # 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
@@ -14,13 +14,12 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.61
-Release:	2
+Version:	0.62.1
+Release:	1
 License:	LGPL
 Group:		Libraries
-Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tgz
-# Source0-md5: 15cc9829beb534606deb3020b3118eb9
-Patch0:		%{name}-nolibnsl.patch
+Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
+# Source0-md5:	d798d6f6d5f2b18c6eb3940798d9ee2b
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -52,7 +51,7 @@ skoñczony, ale mo¿e dzia³aæ w zale¿no¶ci od potrzeb.
 Summary:	FreeTDS header files
 Summary(pl):	Pliki nag³ówkowe FreeTDS
 Group:		Development/Libraries
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
 FreeTDS header files.
@@ -64,7 +63,7 @@ Pliki nag³ówkowe FreeTDS.
 Summary:	FreeTDS static libraries
 Summary(pl):	Statyczne biblioteki FreeTDS
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 FreeTDS static libraries.
@@ -74,7 +73,6 @@ Statyczne biblioteki FreeTDS.
 
 %prep
 %setup -q
-%patch -p1
 
 %build
 %{__libtoolize}
@@ -83,7 +81,7 @@ Statyczne biblioteki FreeTDS.
 %{__automake}
 %configure \
 	--with-tdsver=%{tdsver} \
-	%{?_with_msdblib:--with-msdblib} \
+	%{?with_msdblib:--with-msdblib} \
 	--with-unixodbc=/usr
 
 %{__make}
