@@ -14,12 +14,12 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.62.4
-Release:	2
+Version:	0.63
+Release:	1
 License:	LGPL
 Group:		Libraries
 Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
-# Source0-md5:	09695686e7aa2eaf963c2ebe30c7ae74
+# Source0-md5:	a0a5038cfb708180308b381f848baf75
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
