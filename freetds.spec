@@ -2,27 +2,30 @@
 # _with_msdblib - use MS-style dblib
 #
 # %%define tdsver - protocol version; valid versions:
-# 4.2 (used by MS SQL Server 6.0)
+# 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
 # 4.6
-# 5.0 (used by Sybase only)
+# 5.0 (used by Sybase SQLServer >= 11)
 # 7.0 (used by MS SQL Server 7.0) [default]
-# 8.0 [only login works now]
+# 8.0 (not finished yet!)
 
 %{!?tdsver:%define tdsver 7.0}
 
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.53
+Version:	0.60
 Release:	1
 License:	LGPL
 Group:		Libraries
-Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/%{name}-%{version}.tgz
+Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tgz
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
 BuildRequires:	glib-devel
 BuildRequires:	unixODBC-devel
+Requires(post):	/sbin/ldconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_sysconfdir	/etc/tds
 
 %description
 FreeTDS is a free (open source) implementation of Sybase's db-lib,
@@ -84,14 +87,23 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-p /sbin/ldconfig
+%post
+/sbin/ldconfig
+if [ -f /etc/freetds.conf ]; then
+	mv -f /etc/freetds.conf %{_sysconfdir}/freetds.conf
+fi
+
 %postun	-p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS NEWS README TODO
+%doc AUTHORS BUGS ChangeLog README* TODO
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
+%attr(755,root,root) %{_bindir}/*
+%dir %{_sysconfdir}
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/freetds.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/locales.conf
+%{_mandir}/man1/*
 
 %files devel
 %defattr(644,root,root,755)
