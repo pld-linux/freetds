@@ -112,9 +112,9 @@ fi
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
 %attr(755,root,root) %{_bindir}/*
 %dir %{_sysconfdir}
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/freetds.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/locales.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/pool.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/freetds.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/locales.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/pool.conf
 %{_mandir}/man1/*
 
 %files devel
