@@ -1,30 +1,31 @@
 #
 # Conditional build:
-%bcond_with	msdblib		# use MS-style dblib
+%bcond_with	msdblib		# use MS-style dblib instead of SYB-style
 #
-# %%define tdsver - protocol version; valid versions:
+# %%define tdsver - default protocol version; valid versions:
 # 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
 # 4.6
 # 5.0 (used by Sybase SQLServer >= 11)
-# 7.0 (used by MS SQL Server 7.0) [default]
-# 8.0 (not finished yet!)
+# 7.0 (used by MS SQL Server 7.0) [spec default]
+# 8.0
 
 %{!?tdsver:%define tdsver 7.0}
 
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.63
-Release:	3
+Version:	0.64
+Release:	1
 License:	LGPL
 Group:		Libraries
 Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
-# Source0-md5:	a0a5038cfb708180308b381f848baf75
+# Source0-md5:	ecfee5d6c96932172a1f29fb215c9d23
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libltdl-devel
 BuildRequires:	libtool
+BuildRequires:	openssl-devel
 BuildRequires:	unixODBC-devel
 Requires(post):	/sbin/ldconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -51,6 +52,7 @@ Summary:	FreeTDS header files
 Summary(pl):	Pliki nag³ówkowe FreeTDS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	openssl-devel
 
 %description devel
 FreeTDS header files.
@@ -70,6 +72,21 @@ FreeTDS static libraries.
 %description static -l pl
 Statyczne biblioteki FreeTDS.
 
+%package odbc
+Summary:	FreeTDS ODBC driver for unixODBC
+Summary(pl):	Sterownik ODBC FreeTDS dla unixODBC
+Group:		Libraries
+Requires(post):	/sbin/ldconfig
+Requires(post):	/usr/bin/odbcinst
+Requires:	%{name} = %{version}-%{release}
+Requires:	unixODBC
+
+%description odbc
+FreeTDS ODBC driver for unixODBC.
+
+%description odbc -l pl
+Sterownik ODBC FreeTDS dla unixODBC.
+
 %prep
 %setup -q
 
@@ -81,12 +98,14 @@ Statyczne biblioteki FreeTDS.
 %configure \
 	--with-tdsver=%{tdsver} \
 	%{?with_msdblib:--with-msdblib} \
+	--with-openssl \
 	--with-unixodbc=/usr
 
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	ETC=$RPM_BUILD_ROOT%{_sysconfdir}
@@ -94,6 +113,9 @@ rm -rf $RPM_BUILD_ROOT
 mv -f src/pool/BUGS BUGS.pool
 mv -f src/pool/README README.pool
 mv -f src/pool/TODO TODO.pool
+
+# ODBC driver, dlopen()ed
+rm -f $RPM_BUILD_ROOT%{_libdir}/libtdsodbc.{la,a}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -106,11 +128,31 @@ fi
 
 %postun	-p /sbin/ldconfig
 
+%post odbc
+/sbin/ldconfig
+/usr/bin/odbcinst -i -d -r <<EOF
+[FreeTDS]
+Description = FreeTDS unixODBC Driver
+Driver = %{_libdir}/libtdsodbc.so.0
+Setup = %{_libdir}/libtdsodbc.so.0
+EOF
+/usr/bin/odbcinst -i -d -r <<EOF
+[SQL Server]
+Description = FreeTDS unixODBC Driver
+Driver = %{_libdir}/libtdsodbc.so.0
+Setup = %{_libdir}/libtdsodbc.so.0
+EOF
+
+%postun odbc -p /sbin/ldconfig
+
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS BUGS* ChangeLog NEWS README* TODO*
-%attr(755,root,root) %{_libdir}/lib*.so.*.*
 %attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_libdir}/libct.so.*.*.*
+%attr(755,root,root) %{_libdir}/libsybdb.so.*.*.*
+%attr(755,root,root) %{_libdir}/libtds.so.*.*.*
+%attr(755,root,root) %{_libdir}/libtdssrv.so.*.*.*
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/freetds.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/locales.conf
@@ -119,10 +161,24 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
-%{_includedir}/*
+%attr(755,root,root) %{_libdir}/libct.so
+%attr(755,root,root) %{_libdir}/libsybdb.so
+%attr(755,root,root) %{_libdir}/libtds.so
+%attr(755,root,root) %{_libdir}/libtdssrv.so
+%{_libdir}/libct.la
+%{_libdir}/libsybdb.la
+%{_libdir}/libtds.la
+%{_libdir}/libtdssrv.la
+%{_includedir}/*.h
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libct.a
+%{_libdir}/libsybdb.a
+%{_libdir}/libtds.a
+%{_libdir}/libtdssrv.a
+
+%files odbc
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libtdsodbc.so.*.*.*
+%attr(755,root,root) %{_libdir}/libtdsodbc.so
