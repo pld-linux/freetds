@@ -12,7 +12,7 @@
 %{!?tdsver:%define tdsver 7.0}
 
 Summary:	Free implementation of Sybase's db-lib
-Summary(pl):	Wolnodostêpna implementacja db-lib firmy Sybase
+Summary(pl.UTF-8):   WolnodostÄ™pna implementacja db-lib firmy Sybase
 Name:		freetds
 Version:	0.64
 Release:	1
@@ -39,17 +39,17 @@ databases). Currently, dblib and ctlib are most mature. Both of these
 libraries have several programs known to compile and run against them.
 ODBC is not quite as mature, but may work depending on your needs.
 
-%description -l pl
-FreeTDS to wolnodostêpna (z otwartymi ¼ród³ami) implementacja
-bibliotek db-lib, ct-lib i ODBC firmy Sybase (których mo¿na u¿ywaæ
-tak¿e do pracy z bazami MS SQL). Aktualnie najlepiej dzia³aj± dblib i
-ctlib - istnieje trochê programów, o których wiadomo, ¿e kompiluj± siê
-i dzia³aj± z tymi bibliotekami. ODBC nie jest jeszcze na tyle
-skoñczony, ale mo¿e dzia³aæ w zale¿no¶ci od potrzeb.
+%description -l pl.UTF-8
+FreeTDS to wolnodostÄ™pna (z otwartymi ÅºrÃ³dÅ‚ami) implementacja
+bibliotek db-lib, ct-lib i ODBC firmy Sybase (ktÃ³rych moÅ¼na uÅ¼ywaÄ‡
+takÅ¼e do pracy z bazami MS SQL). Aktualnie najlepiej dziaÅ‚ajÄ… dblib i
+ctlib - istnieje trochÄ™ programÃ³w, o ktÃ³rych wiadomo, Å¼e kompilujÄ… siÄ™
+i dziaÅ‚ajÄ… z tymi bibliotekami. ODBC nie jest jeszcze na tyle
+skoÅ„czony, ale moÅ¼e dziaÅ‚aÄ‡ w zaleÅ¼noÅ›ci od potrzeb.
 
 %package devel
 Summary:	FreeTDS header files
-Summary(pl):	Pliki nag³ówkowe FreeTDS
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe FreeTDS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	openssl-devel
@@ -57,24 +57,24 @@ Requires:	openssl-devel
 %description devel
 FreeTDS header files.
 
-%description devel -l pl
-Pliki nag³ówkowe FreeTDS.
+%description devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe FreeTDS.
 
 %package static
 Summary:	FreeTDS static libraries
-Summary(pl):	Statyczne biblioteki FreeTDS
+Summary(pl.UTF-8):   Statyczne biblioteki FreeTDS
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 FreeTDS static libraries.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczne biblioteki FreeTDS.
 
 %package odbc
 Summary:	FreeTDS ODBC driver for unixODBC
-Summary(pl):	Sterownik ODBC FreeTDS dla unixODBC
+Summary(pl.UTF-8):   Sterownik ODBC FreeTDS dla unixODBC
 Group:		Libraries
 Requires(post):	/sbin/ldconfig
 Requires(post):	/usr/bin/odbcinst
@@ -84,7 +84,7 @@ Requires:	unixODBC
 %description odbc
 FreeTDS ODBC driver for unixODBC.
 
-%description odbc -l pl
+%description odbc -l pl.UTF-8
 Sterownik ODBC FreeTDS dla unixODBC.
 
 %prep
