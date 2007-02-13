@@ -12,7 +12,7 @@
 %{!?tdsver:%define tdsver 7.0}
 
 Summary:	Free implementation of Sybase's db-lib
-Summary(pl.UTF-8):   Wolnodostępna implementacja db-lib firmy Sybase
+Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
 Version:	0.64
 Release:	1
@@ -49,7 +49,7 @@ skończony, ale może działać w zależności od potrzeb.
 
 %package devel
 Summary:	FreeTDS header files
-Summary(pl.UTF-8):   Pliki nagłówkowe FreeTDS
+Summary(pl.UTF-8):	Pliki nagłówkowe FreeTDS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	openssl-devel
@@ -62,7 +62,7 @@ Pliki nagłówkowe FreeTDS.
 
 %package static
 Summary:	FreeTDS static libraries
-Summary(pl.UTF-8):   Statyczne biblioteki FreeTDS
+Summary(pl.UTF-8):	Statyczne biblioteki FreeTDS
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
@@ -74,7 +74,7 @@ Statyczne biblioteki FreeTDS.
 
 %package odbc
 Summary:	FreeTDS ODBC driver for unixODBC
-Summary(pl.UTF-8):   Sterownik ODBC FreeTDS dla unixODBC
+Summary(pl.UTF-8):	Sterownik ODBC FreeTDS dla unixODBC
 Group:		Libraries
 Requires(post):	/sbin/ldconfig
 Requires(post):	/usr/bin/odbcinst
