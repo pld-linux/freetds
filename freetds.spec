@@ -14,15 +14,16 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.64
-Release:	2
+Version:	0.82
+Release:	1
 License:	LGPL
 Group:		Libraries
 Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
-# Source0-md5:	ecfee5d6c96932172a1f29fb215c9d23
+# Source0-md5:	3df6b2e83fd420e90f1becbd1162990a
 URL:		http://www.freetds.org/
-BuildRequires:	autoconf
+BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
+BuildRequires:	gettext
 BuildRequires:	libltdl-devel
 BuildRequires:	libtool
 BuildRequires:	openssl-devel
@@ -91,9 +92,12 @@ Sterownik ODBC FreeTDS dla unixODBC.
 %setup -q
 
 %build
+# hack for libtool 2.2
+cp -f /usr/share/gettext/config.rpath .
 %{__libtoolize}
-%{__aclocal}
+%{__aclocal} -I m4
 %{__autoconf}
+%{__autoheader}
 %{__automake}
 %configure \
 	--with-tdsver=%{tdsver} \
@@ -148,37 +152,48 @@ EOF
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS BUGS* ChangeLog NEWS README* TODO*
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_bindir}/bsqldb
+%attr(755,root,root) %{_bindir}/datacopy
+%attr(755,root,root) %{_bindir}/defncopy
+%attr(755,root,root) %{_bindir}/fisql
+%attr(755,root,root) %{_bindir}/freebcp
+%attr(755,root,root) %{_bindir}/tdspool
+%attr(755,root,root) %{_bindir}/tsql
 %attr(755,root,root) %{_libdir}/libct.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libct.so.4
 %attr(755,root,root) %{_libdir}/libsybdb.so.*.*.*
-%attr(755,root,root) %{_libdir}/libtds.so.*.*.*
-%attr(755,root,root) %{_libdir}/libtdssrv.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libsybdb.so.5
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/freetds.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/locales.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/pool.conf
-%{_mandir}/man1/*
+%{_mandir}/man1/bsqldb.1*
+%{_mandir}/man1/datacopy.1*
+%{_mandir}/man1/defncopy.1*
+%{_mandir}/man1/fisql.1*
+%{_mandir}/man1/freebcp.1*
+%{_mandir}/man1/tsql.1*
+%{_mandir}/man5/freetds.conf.5*
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libct.so
 %attr(755,root,root) %{_libdir}/libsybdb.so
-%attr(755,root,root) %{_libdir}/libtds.so
-%attr(755,root,root) %{_libdir}/libtdssrv.so
 %{_libdir}/libct.la
 %{_libdir}/libsybdb.la
-%{_libdir}/libtds.la
-%{_libdir}/libtdssrv.la
 %{_includedir}/*.h
 
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libct.a
 %{_libdir}/libsybdb.a
-%{_libdir}/libtds.a
-%{_libdir}/libtdssrv.a
 
 %files odbc
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/bsqlodbc
+%attr(755,root,root) %{_bindir}/osql
 %attr(755,root,root) %{_libdir}/libtdsodbc.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libtdsodbc.so.0
 %attr(755,root,root) %{_libdir}/libtdsodbc.so
+%{_mandir}/man1/bsqlodbc.1*
+%{_mandir}/man1/osql.1*
