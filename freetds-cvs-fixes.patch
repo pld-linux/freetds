@@ -1,0 +1,863 @@
+diff -urN freetds/configure.ac freetds.current/configure.ac
+--- freetds/configure.ac	2008-05-08 00:57:52.000000000 +0200
++++ freetds.current/configure.ac	2008-05-28 15:40:28.000000000 +0200
+@@ -1,7 +1,7 @@
+ dnl Process this file with autoconf to produce a configure script.
+ 
+ dnl ------------------------------------------------------------
+-dnl $Id$
++dnl $Id$
+ dnl If you're trying to create a new configure test, try
+ dnl
+ dnl 	http://autogen.sourceforge.net/conftest.html
+@@ -240,7 +240,7 @@
+ ])
+ AC_CHECK_HEADERS([unistd.h errno.h wchar.h sys/time.h sys/types.h \
+ sys/param.h sys/stat.h sys/wait.h limits.h locale.h odbcss.h readpassphrase.h \
+-signal.h libgen.h poll.h])
++signal.h libgen.h poll.h getopt.h])
+ if test $tds_mingw = no; then
+ 	AC_CHECK_HEADERS([sys/socket.h arpa/inet.h netdb.h netinet/in.h \
+ netinet/tcp.h paths.h sys/ioctl.h langinfo.h])
+@@ -347,6 +347,16 @@
+ 
+ TYPE_SOCKLEN_T
+ 
++AC_MSG_CHECKING([whether getopt has optreset support])
++AC_TRY_LINK([#ifdef HAVE_GETOPT_H
++#include <getopt.h>
++#endif], [extern int optreset; optreset = 0;],
++[AC_MSG_RESULT(yes)
++AC_DEFINE(HAVE_GETOPT_OPTRESET, 1, [Define if your getopt(3) defines and uses optreset])],
++[AC_MSG_RESULT(no)]
++)
++
++
+ # ------------------------------------------------------------
+ # Checks for compiler characteristics.
+ # ------------------------------------------------------------
+diff -urN freetds/include/cspublic.h freetds.current/include/cspublic.h
+--- freetds/include/cspublic.h	2007-06-25 11:48:20.000000000 +0200
++++ freetds.current/include/cspublic.h	2008-05-19 16:23:52.000000000 +0200
+@@ -34,7 +34,7 @@
+ #define TDS_STATIC_CAST(type, a) ((type)(a))
+ #endif
+ 
+-static const char rcsid_cspublic_h[] = "$Id$";
++static const char rcsid_cspublic_h[] = "$Id$";
+ static const void *const no_unused_cspublic_h_warn[] = { rcsid_cspublic_h, no_unused_cspublic_h_warn };
+ 
+ #define CS_PUBLIC
+@@ -447,6 +447,9 @@
+ 
+ #define BLK_VERSION_100 CS_VERSION_100
+ #define BLK_VERSION_110 CS_VERSION_100
++#define BLK_VERSION_120 CS_VERSION_120
++#define BLK_VERSION_125 CS_VERSION_125
++#define BLK_VERSION_150 CS_VERSION_150
+ 
+ #define CS_FORCE_EXIT	300
+ #define CS_FORCE_CLOSE  301
+diff -urN freetds/include/tdsbytes.h freetds.current/include/tdsbytes.h
+--- freetds/include/tdsbytes.h	2005-08-10 14:06:03.000000000 +0200
++++ freetds.current/include/tdsbytes.h	2008-05-26 14:49:56.000000000 +0200
+@@ -20,7 +20,7 @@
+ #ifndef _tdsbytes_h_
+ #define _tdsbytes_h_
+ 
+-/* $Id$ */
++/* $Id$ */
+ 
+ #ifndef _tds_h_
+ #error tds.h must be included before tdsbytes.h
+@@ -61,9 +61,9 @@
+ #define TDS_GET_A2BE(ptr) TDS_GET_UA2BE(ptr)
+ 
+ #define TDS_PUT_UA2LE(ptr,val) do {\
+- ((TDS_UCHAR*)(ptr))[1] = (val)>>8; ((TDS_UCHAR*)(ptr))[0] = (val); } while(0)
++ ((TDS_UCHAR*)(ptr))[1] = (TDS_UCHAR)((val)>>8); ((TDS_UCHAR*)(ptr))[0] = (TDS_UCHAR)(val); } while(0)
+ #define TDS_PUT_UA2BE(ptr,val) do {\
+- ((TDS_UCHAR*)(ptr))[0] = (val)>>8; ((TDS_UCHAR*)(ptr))[1] = (val); } while(0)
++ ((TDS_UCHAR*)(ptr))[0] = (TDS_UCHAR)((val)>>8); ((TDS_UCHAR*)(ptr))[1] = (TDS_UCHAR)(val); } while(0)
+ #define TDS_PUT_A2LE(ptr,val) TDS_PUT_UA2LE(ptr,val)
+ #define TDS_PUT_A2BE(ptr,val) TDS_PUT_UA2BE(ptr,val)
+ 
+@@ -78,11 +78,11 @@
+ #define TDS_GET_A4BE(ptr) TDS_GET_UA4BE(ptr)
+ 
+ #define TDS_PUT_UA4LE(ptr,val) do {\
+- ((TDS_UCHAR*)(ptr))[3] = (val)>>24; ((TDS_UCHAR*)(ptr))[2] = (val)>>16;\
+- ((TDS_UCHAR*)(ptr))[1] = (val)>>8; ((TDS_UCHAR*)(ptr))[0] = (val); } while(0)
++ ((TDS_UCHAR*)(ptr))[3] = (TDS_UCHAR)((val)>>24); ((TDS_UCHAR*)(ptr))[2] = (TDS_UCHAR)((val)>>16);\
++ ((TDS_UCHAR*)(ptr))[1] = (TDS_UCHAR)((val)>>8); ((TDS_UCHAR*)(ptr))[0] = (TDS_UCHAR)(val); } while(0)
+ #define TDS_PUT_UA4BE(ptr,val) do {\
+- ((TDS_UCHAR*)(ptr))[0] = (val)>>24; ((TDS_UCHAR*)(ptr))[1] = (val)>>16;\
+- ((TDS_UCHAR*)(ptr))[2] = (val)>>8; ((TDS_UCHAR*)(ptr))[3] = (val); } while(0)
++ ((TDS_UCHAR*)(ptr))[0] = (TDS_UCHAR)((val)>>24); ((TDS_UCHAR*)(ptr))[1] = (TDS_UCHAR)((val)>>16);\
++ ((TDS_UCHAR*)(ptr))[2] = (TDS_UCHAR)((val)>>8); ((TDS_UCHAR*)(ptr))[3] = (TDS_UCHAR)(val); } while(0)
+ #define TDS_PUT_A4LE(ptr,val) TDS_PUT_UA4LE(ptr,val)
+ #define TDS_PUT_A4BE(ptr,val) TDS_PUT_UA4BE(ptr,val)
+ 
+diff -urN freetds/include/tds.h freetds.current/include/tds.h
+--- freetds/include/tds.h	2007-12-27 14:45:22.000000000 +0100
++++ freetds.current/include/tds.h	2008-05-28 00:48:50.000000000 +0200
+@@ -20,12 +20,16 @@
+ #ifndef _tds_h_
+ #define _tds_h_
+ 
+-/* $Id$ */
++/* $Id$ */
+ 
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <time.h>
+ 
++#if HAVE_ARPA_INET_H
++#include <arpa/inet.h>
++#endif /* HAVE_ARPA_INET_H */
++
+ /* forward declaration */
+ typedef struct tdsiconvinfo TDSICONV;
+ typedef struct tds_socket TDSSOCKET;
+@@ -747,7 +751,7 @@
+ 
+ 
+ #define TDS_MAX_CAPABILITY	22
+-#define MAXPRECISION 		80
++#define MAXPRECISION 		77
+ #define TDS_MAX_CONN		4096
+ #define TDS_MAX_DYNID_LEN	30
+ 
+diff -urN freetds/src/apps/freebcp.c freetds.current/src/apps/freebcp.c
+--- freetds/src/apps/freebcp.c	2006-12-01 22:51:11.000000000 +0100
++++ freetds.current/src/apps/freebcp.c	2008-05-28 22:07:55.000000000 +0200
+@@ -45,7 +45,7 @@
+ #include <sybdb.h>
+ #include "freebcp.h"
+ 
+-static char software_version[] = "$Id$";
++static char software_version[] = "$Id$";
+ static void *no_unused_var_warn[] = { software_version, no_unused_var_warn };
+ 
+ void pusage(void);
+@@ -351,6 +351,8 @@
+ 	 */
+ 
+ 	login = dblogin();
++	if (!login)
++		return FALSE;
+ 
+ 	DBSETLUSER(login, pdata->user);
+ 	DBSETLPWD(login, pdata->pass);
+@@ -372,8 +374,11 @@
+ 
+ 	if ((*pdbproc = dbopen(login, pdata->server)) == NULL) {
+ 		fprintf(stderr, "Can't connect to server \"%s\".\n", pdata->server);
++		dbloginfree(login);
+ 		return (FALSE);
+ 	}
++	dbloginfree(login);
++	login = NULL;
+ 
+ 	/* set hint if any */
+ 	if (pdata->hint) {
+diff -urN freetds/src/apps/tsql.c freetds.current/src/apps/tsql.c
+--- freetds/src/apps/tsql.c	2008-01-11 13:46:52.000000000 +0100
++++ freetds.current/src/apps/tsql.c	2008-05-31 10:53:39.000000000 +0200
+@@ -85,7 +85,9 @@
+ #include "tdsconvert.h"
+ #include "replacements.h"
+ 
+-TDS_RCSID(var, "$Id$");
++TDS_RCSID(var, "$Id$");
++
++#define TDS_ISSPACE(c) isspace((unsigned char) (c))
+ 
+ enum
+ {
+@@ -301,6 +303,15 @@
+ 		progname, progname);
+ }
+ 
++static void
++reset_getopt(void)
++{
++#ifdef HAVE_GETOPT_OPTRESET
++	optreset = 1;
++#endif
++	optind = 1;
++}
++
+ /*
+  * The 'GO' command may be followed by options that apply to the batch.
+  * If they don't appear to be right, assume the letters "go" are part of the
+@@ -324,7 +335,7 @@
+ 		s = NULL;
+ 
+ 	*opt_flags = 0;
+-	optind = 0;		/* reset getopt */
++	reset_getopt();
+ 	opterr = 0;		/* suppress error messages */
+ 	while ((opt = getopt(argc, argv, "fhqtv")) != -1) {
+ 		switch (opt) {
+@@ -396,24 +407,24 @@
+ 			opt_flags_str = optarg;
+ 			break;
+ 		case 'H':
+-			hostname = (char *) malloc(strlen(optarg) + 1);
+-			strcpy(hostname, optarg);
++			free(hostname);
++			hostname = strdup(optarg);
+ 			break;
+ 		case 'S':
+-			servername = (char *) malloc(strlen(optarg) + 1);
+-			strcpy(servername, optarg);
++			free(servername);
++			servername = strdup(optarg);
+ 			break;
+ 		case 'U':
+-			username = (char *) malloc(strlen(optarg) + 1);
+-			strcpy(username, optarg);
++			free(username);
++			username = strdup(optarg);
+ 			break;
+ 		case 'P':
+-			password = (char *) malloc(strlen(optarg) + 1);
+-			strcpy(password, optarg);
++			free(password);
++			password = strdup(optarg);
+ 			break;
+ 		case 'I':
+-			confile = (char *) malloc(strlen(optarg) + 1);
+-			strcpy(confile, optarg);
++			free(confile);
++			confile = strdup(optarg);
+ 			break;
+ 		case 'p':
+ 			port = atoi(optarg);
+@@ -524,6 +535,7 @@
+ 	}
+ 
+ 	/* free up all the memory */
++	free(confile);
+ 	free(hostname);
+ 	free(username);
+ 	free(password);
+@@ -572,6 +584,7 @@
+ 		tsql_add_history(s);
+ 		(*line)++;
+ 	}
++	fclose(fp);
+ }
+ 
+ extern const char STD_DATETIME_FMT[];
+@@ -709,7 +722,7 @@
+ 		 *  The rest of the line may include options that apply to the batch, 
+ 		 *  and perhaps whitespace.  
+ 		 */
+-		if (0 == strncasecmp(s, "go", 2) && (strlen(s) == 2 || isspace(s[2]))) {
++		if (0 == strncasecmp(s, "go", 2) && (strlen(s) == 2 || TDS_ISSPACE(s[2]))) {
+ 			char *go_line = strdup(s);
+ 			assert(go_line);
+ 			line = 0;
+diff -urN freetds/src/dblib/bcp.c freetds.current/src/dblib/bcp.c
+--- freetds/src/dblib/bcp.c	2008-01-08 16:38:31.000000000 +0100
++++ freetds.current/src/dblib/bcp.c	2008-05-26 14:49:56.000000000 +0200
+@@ -71,7 +71,7 @@
+ }
+ TDS_PBCB;
+ 
+-TDS_RCSID(var, "$Id$");
++TDS_RCSID(var, "$Id$");
+ 
+ #ifdef HAVE_FSEEKO
+ typedef off_t offset_type;
+@@ -799,11 +799,13 @@
+ 
+ 	if (dbproc->bcpinfo->direction == DB_QUERYOUT ) {
+ 		if (tds_submit_query(tds, dbproc->bcpinfo->tablename) == TDS_FAIL) {
++			fclose(hostfile);
+ 			return FAIL;
+ 		}
+ 	} else {
+ 		/* TODO quote if needed */
+ 		if (tds_submit_queryf(tds, "select * from %s", dbproc->bcpinfo->tablename) == TDS_FAIL) {
++			fclose(hostfile);
+ 			return FAIL;
+ 		}
+ 	}
+@@ -1061,6 +1063,7 @@
+ 					break;
+ 				}
+ 				if( plen != 0 && written != 1 ) {
++					fclose(hostfile);
+ 					dbperror(dbproc, SYBEBCWE, errno);
+ 					return FAIL;
+ 				}
+@@ -1073,6 +1076,7 @@
+ 				if (buflen > 0) {
+ 					written = fwrite(hostcol->bcp_column_data->data, buflen, 1, hostfile);
+ 					if (written < 1) {
++						fclose(hostfile);
+ 						dbperror(dbproc, SYBEBCWE, errno);
+ 						return FAIL;
+ 					}
+@@ -1082,6 +1086,7 @@
+ 				if (hostcol->terminator && hostcol->term_len > 0) {
+ 					written = fwrite(hostcol->terminator, hostcol->term_len, 1, hostfile);
+ 					if (written < 1) {
++						fclose(hostfile);
+ 						dbperror(dbproc, SYBEBCWE, errno);
+ 						return FAIL;
+ 					}
+@@ -1094,6 +1099,7 @@
+ 		dbperror(dbproc, SYBEBCUC, errno);
+ 		return (FAIL);
+ 	}
++	hostfile = NULL;
+ 
+ 	if (dbproc->hostfileinfo->firstrow > 0 && row_of_query < dbproc->hostfileinfo->firstrow) {
+ 		/* 
+@@ -1896,8 +1902,10 @@
+ 		return FAIL;
+ 	}
+ 
+-	if (_bcp_start_copy_in(dbproc) == FAIL)
++	if (_bcp_start_copy_in(dbproc) == FAIL) {
++		fclose(hostfile);
+ 		return FAIL;
++	}
+ 
+ 	tds->out_flag = TDS_BULK;
+ 	tds_set_state(tds, TDS_QUERYING);
+@@ -1922,6 +1930,7 @@
+ 
+ 			if (errfile == NULL && dbproc->hostfileinfo->errorfile) {
+ 				if (!(errfile = fopen(dbproc->hostfileinfo->errorfile, "w"))) {
++					fclose(hostfile);
+ 					dbperror(dbproc, SYBEBUOE, 0);
+ 					return FAIL;
+ 				}
+@@ -2003,6 +2012,7 @@
+ 						if (tds_process_simple_query(tds) != TDS_SUCCEED) {
+ 							if (errfile)
+ 								fclose(errfile);
++							fclose(hostfile);
+ 							return FAIL;
+ 						}
+ 							
+diff -urN freetds/src/dblib/dblib.c freetds.current/src/dblib/dblib.c
+--- freetds/src/dblib/dblib.c	2008-01-02 00:09:46.000000000 +0100
++++ freetds.current/src/dblib/dblib.c	2008-05-26 14:49:56.000000000 +0200
+@@ -76,7 +76,7 @@
+ #include <dmalloc.h>
+ #endif
+ 
+-TDS_RCSID(var, "$Id$");
++TDS_RCSID(var, "$Id$");
+ 
+ static RETCODE _dbresults(DBPROCESS * dbproc);
+ static int _db_get_server_type(int bindtype);
+@@ -3325,8 +3325,10 @@
+ 			computeid = status;
+ 
+ 			for (i = 0;; ++i) {
+-				if (i >= tds->num_comp_info)
++				if (i >= tds->num_comp_info) {
++					free(col_printlens);
+ 					return FAIL;
++				}
+ 				resinfo = tds->comp_info[i];
+ 				if (resinfo->computeid == computeid)
+ 					break;
+diff -urN freetds/src/odbc/odbc.c freetds.current/src/odbc/odbc.c
+--- freetds/src/odbc/odbc.c	2008-04-30 16:59:32.000000000 +0200
++++ freetds.current/src/odbc/odbc.c	2008-06-18 06:11:39.000000000 +0200
+@@ -60,7 +60,7 @@
+ #include <dmalloc.h>
+ #endif
+ 
+-TDS_RCSID(var, "$Id$");
++TDS_RCSID(var, "$Id$");
+ 
+ static SQLRETURN _SQLAllocConnect(SQLHENV henv, SQLHDBC FAR * phdbc);
+ static SQLRETURN _SQLAllocEnv(SQLHENV FAR * phenv);
+@@ -3608,10 +3608,6 @@
+ 					truncated = 1;
+ 					stmt->errs.lastrc = SQL_SUCCESS_WITH_INFO;
+ 				}
+-			} else {
+-				/* TODO change when we code cursors support... */
+-				/* stop looping, forward cursor support only one row */
+-				num_rows = 1;
+ 			}
+ 			if (drec_ard->sql_desc_octet_length_ptr)
+ 				*AT_ROW(drec_ard->sql_desc_octet_length_ptr, SQLLEN) = len;
+@@ -3648,11 +3644,33 @@
+ SQLRETURN ODBC_API
+ SQLFetch(SQLHSTMT hstmt)
+ {
++	SQLRETURN ret;
++	SQLULEN  save_sql_desc_array_size;
++	SQLULEN *save_sql_desc_rows_processed_ptr;
++	SQLUSMALLINT *save_sql_desc_array_status_ptr;
++
+ 	INIT_HSTMT;
+ 
+ 	tdsdump_log(TDS_DBG_FUNC, "SQLFetch(%p)\n", hstmt);
+ 
+-	ODBC_RETURN(stmt, _SQLFetch(stmt, SQL_FETCH_NEXT, 0));
++	if (stmt->dbc->env->attr.odbc_version != SQL_OV_ODBC3) {
++		save_sql_desc_array_size = stmt->ard->header.sql_desc_array_size;
++		stmt->ard->header.sql_desc_array_size = 1;
++		save_sql_desc_rows_processed_ptr = stmt->ird->header.sql_desc_rows_processed_ptr;
++		stmt->ird->header.sql_desc_rows_processed_ptr = NULL;
++		save_sql_desc_array_status_ptr = stmt->ird->header.sql_desc_array_status_ptr;
++		stmt->ird->header.sql_desc_array_status_ptr = NULL;
++	}
++
++	ret = _SQLFetch(stmt, SQL_FETCH_NEXT, 0);
++
++	if (stmt->dbc->env->attr.odbc_version != SQL_OV_ODBC3) {
++		stmt->ard->header.sql_desc_array_size = save_sql_desc_array_size;
++		stmt->ird->header.sql_desc_rows_processed_ptr = save_sql_desc_rows_processed_ptr;
++		stmt->ird->header.sql_desc_array_status_ptr = save_sql_desc_array_status_ptr;
++	}
++
++	ODBC_RETURN(stmt, ret);
+ }
+ 
+ #if (ODBCVER >= 0x0300)
+@@ -4564,6 +4582,8 @@
+ 	SQLLEN dummy_cb;
+ 	int nSybType;
+ 
++	int extra_bytes = 0;
++
+ 	INIT_HSTMT;
+ 
+ 	tdsdump_log(TDS_DBG_FUNC, "SQLGetData(%p, %u, %d, %p, %d, %p)\n", 
+@@ -4601,42 +4621,140 @@
+ 	if (colinfo->column_cur_size < 0) {
+ 		*pcbValue = SQL_NULL_DATA;
+ 	} else {
++		nSybType = tds_get_conversion_type(colinfo->column_type, colinfo->column_size);
++		if (fCType == SQL_C_DEFAULT)
++			fCType = odbc_sql_to_c_type_default(stmt->ird->records[icol - 1].sql_desc_concise_type);
++		if (fCType == SQL_ARD_TYPE) {
++			if (icol > stmt->ard->header.sql_desc_count) {
++				odbc_errs_add(&stmt->errs, "07009", NULL);
++				ODBC_RETURN(stmt, SQL_ERROR);
++			}
++			fCType = stmt->ard->records[icol - 1].sql_desc_concise_type;
++		}
++		assert(fCType);
++
+ 		src = (TDS_CHAR *) colinfo->column_data;
+ 		if (is_variable_type(colinfo->column_type)) {
+-			if (colinfo->column_text_sqlgetdatapos > 0
+-			    && colinfo->column_text_sqlgetdatapos >= colinfo->column_cur_size)
+-				ODBC_RETURN(stmt, SQL_NO_DATA);
+-
++			int nread = 0;
++			
+ 			/* 2003-8-29 check for an old bug -- freddy77 */
+ 			assert(colinfo->column_text_sqlgetdatapos >= 0);
+ 			if (is_blob_type(colinfo->column_type))
+ 				src = ((TDSBLOB *) src)->textvalue;
+-			src += colinfo->column_text_sqlgetdatapos;
+-			srclen = colinfo->column_cur_size - colinfo->column_text_sqlgetdatapos;
++
++			if (fCType == SQL_C_CHAR && colinfo->column_text_sqlgetdatapos) {
++				TDS_CHAR buf[3];
++				SQLLEN len;
++
++				switch (nSybType) {
++				case SYBLONGBINARY:
++				case SYBBINARY:
++				case SYBVARBINARY:
++				case SYBIMAGE:
++				case XSYBBINARY:
++				case XSYBVARBINARY:
++				case TDS_CONVERT_BINARY:
++					if (colinfo->column_text_sqlgetdatapos % 2) {
++						nread = (colinfo->column_text_sqlgetdatapos - 1) / 2;
++						if (nread >= colinfo->column_cur_size)
++							ODBC_RETURN(stmt, SQL_NO_DATA);
++						
++						if (cbValueMax > 2) {
++							len = convert_tds2sql(context, nSybType, src + nread, 1, fCType, buf, sizeof(buf), NULL);
++							if (len < 2) {
++								if (len < 0) 
++									odbc_convert_err_set(&stmt->errs, len);
++								ODBC_RETURN(stmt, SQL_ERROR);
++							}
++							*(TDS_CHAR *) rgbValue = buf[1];
++							*((TDS_CHAR *) rgbValue + 1) = 0;
++						
++							rgbValue++;
++							cbValueMax--;
++						
++							extra_bytes = 1;
++							nread++;
++
++							if (nread >= colinfo->column_cur_size)
++								ODBC_RETURN_(stmt);
++						} else {
++							if (cbValueMax) 
++								*(TDS_CHAR *) rgbValue = 0;
++							odbc_errs_add(&stmt->errs, "01004", "String data, right truncated");
++							ODBC_RETURN(stmt, SQL_SUCCESS_WITH_INFO);
++						}
++					} else {
++						nread = colinfo->column_text_sqlgetdatapos / 2;
++						if (nread >= colinfo->column_cur_size)
++							ODBC_RETURN(stmt, SQL_NO_DATA);
++					}
++					
++					src += nread;
++					srclen = colinfo->column_cur_size - nread;
++					break;
++				default:
++					if (colinfo->column_text_sqlgetdatapos >= colinfo->column_cur_size)
++						ODBC_RETURN(stmt, SQL_NO_DATA);
++						
++					src += colinfo->column_text_sqlgetdatapos;
++					srclen = colinfo->column_cur_size - colinfo->column_text_sqlgetdatapos;
++
++				}
++			} else if (fCType == SQL_C_BINARY) {
++				switch (nSybType) {
++				case SYBCHAR:
++				case SYBVARCHAR:
++				case SYBTEXT:
++				case XSYBCHAR:
++				case XSYBVARCHAR:
++					nread = (src[0] == '0' && toupper(src[1]) == 'X')? 2 : 0;
++						
++					while ((nread < colinfo->column_cur_size) && (src[nread] == ' ' || src[nread] == '\0')) 
++						nread++;
++
++					nread += colinfo->column_text_sqlgetdatapos * 2;
++					
++					if (nread && nread >= colinfo->column_cur_size)
++						ODBC_RETURN(stmt, SQL_NO_DATA);
++
++					src += nread;
++					srclen = colinfo->column_cur_size - nread;
++					break;
++				default:
++					if (colinfo->column_text_sqlgetdatapos > 0
++					&&  colinfo->column_text_sqlgetdatapos >= colinfo->column_cur_size)
++						ODBC_RETURN(stmt, SQL_NO_DATA);
++						
++					src += colinfo->column_text_sqlgetdatapos;
++					srclen = colinfo->column_cur_size - colinfo->column_text_sqlgetdatapos;
++				}
++			} else {
++				if (colinfo->column_text_sqlgetdatapos > 0
++				&&  colinfo->column_text_sqlgetdatapos >= colinfo->column_cur_size)
++					ODBC_RETURN(stmt, SQL_NO_DATA);
++
++				src += colinfo->column_text_sqlgetdatapos;
++				srclen = colinfo->column_cur_size - colinfo->column_text_sqlgetdatapos;
++			}
+ 		} else {
+ 			if (colinfo->column_text_sqlgetdatapos > 0
+-			    && colinfo->column_text_sqlgetdatapos >= colinfo->column_cur_size)
++			&&  colinfo->column_text_sqlgetdatapos >= colinfo->column_cur_size)
+ 				ODBC_RETURN(stmt, SQL_NO_DATA);
+ 
+ 			srclen = colinfo->column_cur_size;
+ 		}
+-		nSybType = tds_get_conversion_type(colinfo->column_type, colinfo->column_size);
+-		if (fCType == SQL_C_DEFAULT)
+-			fCType = odbc_sql_to_c_type_default(stmt->ird->records[icol - 1].sql_desc_concise_type);
+-		if (fCType == SQL_ARD_TYPE) {
+-			if (icol > stmt->ard->header.sql_desc_count) {
+-				odbc_errs_add(&stmt->errs, "07009", NULL);
+-				ODBC_RETURN(stmt, SQL_ERROR);
+-			}
+-			fCType = stmt->ard->records[icol - 1].sql_desc_concise_type;
+-		}
+-		assert(fCType);
++
+ 		*pcbValue = convert_tds2sql(context, nSybType, src, srclen, fCType, (TDS_CHAR *) rgbValue, cbValueMax, NULL);
+ 		if (*pcbValue < 0) {
+ 			odbc_convert_err_set(&stmt->errs, *pcbValue);
+ 			ODBC_RETURN(stmt, SQL_ERROR);
+ 		}
+-
++		
++		if (extra_bytes) {
++			colinfo->column_text_sqlgetdatapos += extra_bytes;
++			*pcbValue += extra_bytes;
++		}
++		
+ 		if (is_variable_type(colinfo->column_type) && (fCType == SQL_C_CHAR || fCType == SQL_C_BINARY)) {
+ 			/* calc how many bytes was readed */
+ 			int readed = cbValueMax;
+diff -urN freetds/src/odbc/unittests/cursor6.c freetds.current/src/odbc/unittests/cursor6.c
+--- freetds/src/odbc/unittests/cursor6.c	1970-01-01 01:00:00.000000000 +0100
++++ freetds.current/src/odbc/unittests/cursor6.c	2008-06-06 18:52:23.000000000 +0200
+@@ -0,0 +1,140 @@
++#include "common.h"
++
++/* Test SQLFetchScroll with no binded columns */
++
++static char software_version[] = "$Id$";
++static void *no_unused_var_warn[] = { software_version, no_unused_var_warn };
++
++static int bind_all = 0;
++static int normal_fetch = 0;
++static int use_cursors = 1;
++
++#define CHK(func,params) do { \
++	if (func params != SQL_SUCCESS) \
++		ODBC_REPORT_ERROR(#func); \
++	} while(0)
++
++static void Test(void)
++{
++#define ROWS 5
++	struct data_t {
++		SQLINTEGER i;
++		SQLLEN ind_i;
++		char c[20];
++		SQLLEN ind_c;
++	} data[ROWS];
++	SQLUSMALLINT statuses[ROWS];
++	SQLULEN num_row;
++
++	ResetStatement();
++
++	/* this should not fail or return warnings */
++	if (use_cursors) {
++		CHK(SQLSetStmtAttr, (Statement, SQL_ATTR_CONCURRENCY, int2ptr(SQL_CONCUR_READ_ONLY), 0));
++		CHK(SQLSetStmtAttr, (Statement, SQL_ATTR_CURSOR_TYPE, int2ptr(SQL_CURSOR_STATIC), 0));
++	}
++	CHK(SQLPrepare, (Statement, (SQLCHAR *) "SELECT c, i FROM #cursor6_test", SQL_NTS));
++	CHK(SQLExecute, (Statement));
++	CHK(SQLSetStmtAttr, (Statement, SQL_ATTR_ROW_BIND_TYPE, int2ptr(sizeof(data[0])), 0));
++	CHK(SQLSetStmtAttr, (Statement, SQL_ATTR_ROW_ARRAY_SIZE, int2ptr(ROWS), 0));
++	CHK(SQLSetStmtAttr, (Statement, SQL_ATTR_ROW_STATUS_PTR, statuses, 0));
++	CHK(SQLSetStmtAttr, (Statement, SQL_ATTR_ROWS_FETCHED_PTR, &num_row, 0));
++	if (bind_all)
++		CHK(SQLBindCol, (Statement, 1, SQL_C_CHAR, &data[0].c, sizeof(data[0].c), &data[0].ind_c));
++	CHK(SQLBindCol, (Statement, 2, SQL_C_LONG, &data[0].i, sizeof(data[0].i), &data[0].ind_i));
++
++#define FILL(s, n) do { \
++	int _n; for (_n = 0; _n < sizeof(s)/sizeof(s[0]); ++_n) s[_n] = n; \
++} while(0)
++	FILL(statuses, 9876);
++	num_row = -3;
++	data[0].i = 0xdeadbeef;
++	data[1].i = 0xdeadbeef;
++	if (normal_fetch)
++		CHK(SQLFetch, (Statement));
++	else
++		CHK(SQLFetchScroll, (Statement, SQL_FETCH_NEXT, 0));
++
++	/* now check row numbers */
++	printf("num_row %d statuses[0] %d statuses[1] %d odbc3 %d\n", (int) num_row,
++		(int) statuses[0], (int) statuses[1], use_odbc_version3);
++
++	if (use_odbc_version3 || !normal_fetch) {
++		if (num_row != ROWS || statuses[0] != SQL_ROW_SUCCESS || statuses[1] != SQL_ROW_SUCCESS) {
++			fprintf(stderr, "result error 1\n");
++			exit(1);
++		}
++	} else {
++		if (data[0].i != 1 || data[1].i != 0xdeadbeef) {
++			fprintf(stderr, "result error 2\n");
++			exit(1);
++		}
++	}
++
++	FILL(statuses, 8765);
++	num_row = -3;
++	if (normal_fetch)
++		CHK(SQLFetch, (Statement));
++	else
++		CHK(SQLFetchScroll, (Statement, SQL_FETCH_NEXT, 0));
++}
++
++static void Init(void)
++{
++	int i;
++	char sql[128];
++
++	Command(Statement, "CREATE TABLE #cursor6_test (i INT, c VARCHAR(20))");
++	for (i = 1; i <= 10; ++i) {
++		sprintf(sql, "INSERT INTO #cursor6_test(i,c) VALUES(%d, 'a%db%dc%d')", i, i, i, i);
++		Command(Statement, sql);
++	}
++
++}
++
++int
++main(int argc, char *argv[])
++{
++	unsigned char sqlstate[6];
++	unsigned char msg[256];
++	SQLRETURN retcode;
++
++	use_odbc_version3 = 1;
++	Connect();
++
++	retcode = SQLSetConnectAttr(Connection, SQL_ATTR_CURSOR_TYPE,  (SQLPOINTER) SQL_CURSOR_DYNAMIC, SQL_IS_INTEGER);
++	if (retcode != SQL_SUCCESS) {
++		CHK(SQLGetDiagRec, (SQL_HANDLE_DBC, Connection, 1, sqlstate, NULL, (SQLCHAR *) msg, sizeof(msg), NULL));
++		sqlstate[5] = 0;
++		if (strcmp((const char*) sqlstate, "S1092") == 0) {
++			printf("Your connection seems to not support cursors, probably you are using wrong protocol version or Sybase\n");
++			Disconnect();
++			exit(0);
++		}
++		ODBC_REPORT_ERROR("SQLSetConnectAttr");
++	}
++
++	Init();
++
++#define ALL(n) for (n = 0; n < 2; ++n)
++	ALL(use_cursors)
++		ALL(bind_all)
++			ALL(normal_fetch)
++				Test();
++
++	Disconnect();
++
++	use_odbc_version3 = 0;
++
++	Connect();
++	Init();
++
++	ALL(use_cursors)
++		ALL(bind_all)
++			ALL(normal_fetch)
++				Test();
++
++	Disconnect();
++	
++	return 0;
++}
+diff -urN freetds/src/odbc/unittests/getdata.c freetds.current/src/odbc/unittests/getdata.c
+--- freetds/src/odbc/unittests/getdata.c	2008-01-29 11:14:31.000000000 +0100
++++ freetds.current/src/odbc/unittests/getdata.c	2008-06-18 06:11:39.000000000 +0200
+@@ -1,6 +1,6 @@
+ #include "common.h"
+ 
+-static char software_version[] = "$Id$";
++static char software_version[] = "$Id$";
+ static void *no_unused_var_warn[] = { software_version, no_unused_var_warn };
+ 
+ static char odbc_err[256];
+@@ -11,7 +11,14 @@
+ {
+ 	memset(odbc_err, 0, sizeof(odbc_err));
+ 	memset(odbc_sqlstate, 0, sizeof(odbc_sqlstate));
+-	if (!SQL_SUCCEEDED(SQLGetDiagRec(SQL_HANDLE_STMT, Statement, 1, (SQLCHAR *) odbc_sqlstate, NULL, (SQLCHAR *) odbc_err, sizeof(odbc_err), NULL))) {
++	if (!SQL_SUCCEEDED(SQLGetDiagRec(SQL_HANDLE_STMT
++					, Statement
++					, 1
++					, (SQLCHAR *) odbc_sqlstate
++					, NULL
++					, (SQLCHAR *) odbc_err
++					, sizeof(odbc_err)
++					, NULL))) {
+ 		printf("SQLGetDiagRec should not fail\n");
+ 		exit(1);
+ 	}
+diff -urN freetds/src/odbc/unittests/Makefile.am freetds.current/src/odbc/unittests/Makefile.am
+--- freetds/src/odbc/unittests/Makefile.am	2008-02-29 10:23:51.000000000 +0100
++++ freetds.current/src/odbc/unittests/Makefile.am	2008-06-06 18:52:23.000000000 +0200
+@@ -1,4 +1,4 @@
+-# $Id$
++# $Id$
+ TESTS		=	\
+ 			t0001$(EXEEXT) t0002$(EXEEXT) t0003$(EXEEXT)\
+ 			t0004$(EXEEXT) connect$(EXEEXT) print$(EXEEXT)\
+@@ -21,7 +21,7 @@
+ 			connect2$(EXEEXT) timeout4$(EXEEXT) freeclose$(EXEEXT) \
+ 			cursor3$(EXEEXT) cursor4$(EXEEXT) cursor5$(EXEEXT) \
+ 			attributes$(EXEEXT) hidden$(EXEEXT) blob1$(EXEEXT) \
+-			rowset$(EXEEXT)
++			rowset$(EXEEXT) cursor6$(EXEEXT)
+ 
+ check_PROGRAMS	=	$(TESTS)
+ 
+@@ -81,6 +81,7 @@
+ hidden_SOURCES	= hidden.c common.c common.h
+ blob1_SOURCES	= blob1.c common.c common.h
+ rowset_SOURCES	= rowset.c common.c common.h
++cursor6_SOURCES	= cursor6.c common.c common.h
+ 
+ AM_CPPFLAGS	=	-I$(top_srcdir)/include $(ODBC_INC) -DFREETDS_SRCDIR=\"$(srcdir)\"
+ if MINGW32
+diff -urN freetds/src/server/server.c freetds.current/src/server/server.c
+--- freetds/src/server/server.c	2008-01-07 15:07:21.000000000 +0100
++++ freetds.current/src/server/server.c	2008-05-28 23:08:03.000000000 +0200
+@@ -30,7 +30,7 @@
+ #include "tds.h"
+ #include "tdssrv.h"
+ 
+-static char software_version[] = "$Id$";
++static char software_version[] = "$Id$";
+ static void *no_unused_var_warn[] = { software_version, no_unused_var_warn };
+ 
+ void
+@@ -117,13 +117,17 @@
+ 	     const char *msgtext, const char *srvname, const char *procname, int line)
+ {
+ 	int msgsz;
++	size_t len;
+ 
+ 	tds_put_byte(tds, TDS_INFO_TOKEN);
++	if (!procname)
++		procname = "";
++	len = strlen(procname);
+ 	msgsz = 4		/* msg no    */
+ 		+ 1		/* msg state */
+ 		+ 1		/* severity  */
+ 		/* FIXME ucs2 */
+-		+ (IS_TDS7_PLUS(tds) ? 2 : 1) * (strlen(msgtext) + 1 + strlen(srvname) + 1 + strlen(procname))
++		+ (IS_TDS7_PLUS(tds) ? 2 : 1) * (strlen(msgtext) + 1 + strlen(srvname) + 1 + len)
+ 		+ 1 + 2;	/* line number */
+ 	tds_put_smallint(tds, msgsz);
+ 	tds_put_int(tds, msgno);
+@@ -135,10 +139,10 @@
+ 	tds_put_byte(tds, strlen(srvname));
+ 	/* FIXME ucs2 */
+ 	tds_put_string(tds, srvname, strlen(srvname));
+-	if (procname && strlen(procname)) {
+-		tds_put_byte(tds, strlen(procname));
++	if (len) {
++		tds_put_byte(tds, len);
+ 		/* FIXME ucs2 */
+-		tds_put_string(tds, procname, strlen(procname));
++		tds_put_string(tds, procname, len);
+ 	} else {
+ 		tds_put_byte(tds, 0);
+ 	}
+diff -urN freetds/src/tds/mem.c freetds.current/src/tds/mem.c
+--- freetds/src/tds/mem.c	2007-12-31 11:06:50.000000000 +0100
++++ freetds.current/src/tds/mem.c	2008-05-26 14:49:56.000000000 +0200
+@@ -47,7 +47,7 @@
+ #include <dmalloc.h>
+ #endif
+ 
+-TDS_RCSID(var, "$Id$");
++TDS_RCSID(var, "$Id$");
+ 
+ static void tds_free_env(TDSSOCKET * tds);
+ static void tds_free_compute_results(TDSSOCKET * tds);
+@@ -1040,6 +1040,9 @@
+ void
+ tds_free_connection(TDSCONNECTION * connection)
+ {
++	if (!connection)
++		return;
++
+ 	tds_dstr_free(&connection->server_name);
+ 	tds_dstr_free(&connection->client_host_name);
+ 	tds_dstr_free(&connection->server_host_name);
