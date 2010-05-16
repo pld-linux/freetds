@@ -24,7 +24,7 @@ Patch0:		%{name}-cvs-fixes.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
-BuildRequires:	gettext
+BuildRequires:	gettext-devel
 BuildRequires:	libltdl-devel
 BuildRequires:	libtool
 BuildRequires:	openssl-devel
