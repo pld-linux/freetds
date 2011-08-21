@@ -1,30 +1,31 @@
 #
 # Conditional build:
 %bcond_with	msdblib		# use MS-style dblib instead of SYB-style
+%bcond_without	kerberos5	# Kerberos5 support (via Heimdal)
 #
 # %%define tdsver - default protocol version; valid versions:
 # 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
 # 4.6
 # 5.0 (used by Sybase SQLServer >= 11)
 # 7.0 (used by MS SQL Server 7.0) [spec default]
-# 8.0
+# 7.1 (used by MS SQL Server 2000)
 
 %{!?tdsver:%define tdsver 7.0}
 
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.82
-Release:	5
-License:	LGPL
+Version:	0.91
+Release:	1
+License:	LGPL v2+
 Group:		Libraries
 Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
-# Source0-md5:	3df6b2e83fd420e90f1becbd1162990a
-Patch0:		%{name}-cvs-fixes.patch
+# Source0-md5:	b14db5823980a32f0643d1a84d3ec3ad
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	gettext-devel
+%{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	libltdl-devel
 BuildRequires:	libtool
 BuildRequires:	openssl-devel
@@ -54,6 +55,7 @@ Summary:	FreeTDS header files
 Summary(pl.UTF-8):	Pliki nagłówkowe FreeTDS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+%{?with_kerberos5:Requires:	heimdal-devel}
 Requires:	openssl-devel
 
 %description devel
@@ -91,17 +93,15 @@ Sterownik ODBC FreeTDS dla unixODBC.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
-# hack for libtool 2.2
-cp -f /usr/share/gettext/config.rpath .
 %{__libtoolize}
 %{__aclocal} -I m4
 %{__autoconf}
 %{__autoheader}
 %{__automake}
 %configure \
+	%{?with_kerberos5:--enable-krb5=gssapi} \
 	--with-tdsver=%{tdsver} \
 	%{?with_msdblib:--with-msdblib} \
 	--with-openssl \
@@ -121,7 +121,7 @@ mv -f src/pool/README README.pool
 mv -f src/pool/TODO TODO.pool
 
 # ODBC driver, dlopen()ed
-rm -f $RPM_BUILD_ROOT%{_libdir}/libtdsodbc.{la,a}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libtdsodbc.{la,a}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -153,7 +153,7 @@ EOF
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS* ChangeLog NEWS README* TODO*
+%doc AUTHORS BUGS* ChangeLog NEWS README* TODO* doc/doc/%{name}-%{version}/userguide
 %attr(755,root,root) %{_bindir}/bsqldb
 %attr(755,root,root) %{_bindir}/datacopy
 %attr(755,root,root) %{_bindir}/defncopy
@@ -179,6 +179,7 @@ EOF
 
 %files devel
 %defattr(644,root,root,755)
+%doc doc/doc/%{name}-%{version}/reference
 %attr(755,root,root) %{_libdir}/libct.so
 %attr(755,root,root) %{_libdir}/libsybdb.so
 %{_libdir}/libct.la
