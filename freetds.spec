@@ -19,7 +19,7 @@ Version:	0.91
 Release:	2
 License:	LGPL v2+
 Group:		Libraries
-Source0:	ftp://ftp.ibiblio.org/pub/Linux/ALPHA/freetds/stable/%{name}-%{version}.tar.gz
+Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.gz
 # Source0-md5:	b14db5823980a32f0643d1a84d3ec3ad
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
