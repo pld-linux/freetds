@@ -24,7 +24,7 @@ Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.gz
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
-BuildRequires:	gettext-devel
+BuildRequires:	gettext-tools
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	libltdl-devel
 BuildRequires:	libtool
