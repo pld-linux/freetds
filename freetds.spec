@@ -21,6 +21,7 @@ License:	LGPL v2+
 Group:		Libraries
 Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.gz
 # Source0-md5:	b14db5823980a32f0643d1a84d3ec3ad
+Patch0:		format-security.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -93,6 +94,7 @@ Sterownik ODBC FreeTDS dla unixODBC.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %{__libtoolize}
@@ -116,12 +118,14 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT \
 	ETC=$RPM_BUILD_ROOT%{_sysconfdir}
 
-mv -f src/pool/BUGS BUGS.pool
-mv -f src/pool/README README.pool
-mv -f src/pool/TODO TODO.pool
+cp -a src/pool/BUGS BUGS.pool
+cp -a src/pool/README README.pool
+cp -a src/pool/TODO TODO.pool
 
 # ODBC driver, dlopen()ed
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libtdsodbc.{la,a}
+
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
