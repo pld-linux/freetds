@@ -9,19 +9,23 @@
 # 5.0 (used by Sybase SQLServer >= 11)
 # 7.0 (used by MS SQL Server 7.0) [spec default]
 # 7.1 (used by MS SQL Server 2000)
+# 7.2 (used by MS SQL Server 2005)
+# 7.3 (used by MS SQL Server 2008)
+# [7.4 (used by MS SQL Server 2012/2014) not supported yet]
 
 %{!?tdsver:%define tdsver 7.0}
 
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.91
-Release:	3
+Version:	0.95.8
+Release:	1
 License:	LGPL v2+
 Group:		Libraries
-Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.gz
-# Source0-md5:	b14db5823980a32f0643d1a84d3ec3ad
-Patch0:		format-security.patch
+Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.bz2
+# Source0-md5:	44b28f2ee1236c47de395193f9ee4810
+Patch0:		%{name}-reserved.patch
+Patch1:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -95,6 +99,7 @@ Sterownik ODBC FreeTDS dla unixODBC.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__libtoolize}
@@ -104,9 +109,10 @@ Sterownik ODBC FreeTDS dla unixODBC.
 %{__automake}
 %configure \
 	%{?with_kerberos5:--enable-krb5=gssapi} \
-	--with-tdsver=%{tdsver} \
+	--disable-silent-rules \
 	%{?with_msdblib:--with-msdblib} \
 	--with-openssl \
+	--with-tdsver=%{tdsver} \
 	--with-unixodbc=/usr
 
 %{__make}
@@ -125,7 +131,8 @@ cp -a src/pool/TODO TODO.pool
 # ODBC driver, dlopen()ed
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libtdsodbc.{la,a}
 
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+# packaged as %doc
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -157,7 +164,7 @@ EOF
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS* ChangeLog NEWS README* TODO* doc/doc/%{name}-%{version}/userguide
+%doc AUTHORS BUGS* ChangeLog NEWS README* TODO* doc/userguide
 %attr(755,root,root) %{_bindir}/bsqldb
 %attr(755,root,root) %{_bindir}/datacopy
 %attr(755,root,root) %{_bindir}/defncopy
@@ -183,12 +190,22 @@ EOF
 
 %files devel
 %defattr(644,root,root,755)
-%doc doc/doc/%{name}-%{version}/reference
+%doc doc/reference
 %attr(755,root,root) %{_libdir}/libct.so
 %attr(755,root,root) %{_libdir}/libsybdb.so
 %{_libdir}/libct.la
 %{_libdir}/libsybdb.la
-%{_includedir}/*.h
+%{_includedir}/bkpublic.h
+%{_includedir}/cspublic.h
+%{_includedir}/cstypes.h
+%{_includedir}/ctpublic.h
+%{_includedir}/odbcss.h
+%{_includedir}/sqldb.h
+%{_includedir}/sqlfront.h
+%{_includedir}/sybdb.h
+%{_includedir}/syberror*.h
+%{_includedir}/sybfront.h
+%{_includedir}/tds_sysdep_public.h
 
 %files static
 %defattr(644,root,root,755)
