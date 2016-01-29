@@ -18,12 +18,12 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.95.65
+Version:	0.95.80
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
 Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	cb83e575669bbf0f6d8951c2009eaf9c
+# Source0-md5:	aae6a130cd30fc61af4ee5de228e142c
 Patch0:		%{name}-reserved.patch
 Patch1:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
