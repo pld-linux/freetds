@@ -13,13 +13,13 @@
  	fi
  	test -r "$ODBC_INC/sql.h" || AC_ERROR([sql.h not found])
  	test -r "$ODBC_INC/sqlext.h" || AC_ERROR([sqlext.h not found])
---- freetds-0.95.8/m4/check_openssl.m4.orig	2015-05-05 19:54:59.000000000 +0200
-+++ freetds-0.95.8/m4/check_openssl.m4	2015-06-25 21:13:31.026538747 +0200
+--- freetds-1.00.13/m4/check_openssl.m4.orig	2016-07-29 19:20:01.111369876 +0200
++++ freetds-1.00.13/m4/check_openssl.m4	2016-07-29 19:20:37.874702783 +0200
 @@ -18,7 +18,6 @@
-     else
-         echo "OpenSSL found in $ssldir"
-         NETWORK_LIBS="$NETWORK_LIBS -lssl -lcrypto"
--        LDFLAGS="$LDFLAGS -L$ssldir/lib"
-         HAVE_OPENSSL=yes
-         AC_DEFINE(HAVE_OPENSSL, 1, [Define if you have the OpenSSL.])
-     fi
+                 found_ssl="yes"
+                 CFLAGS="$CFLAGS -I$ssldir/include"
+                 NETWORK_LIBS="$NETWORK_LIBS -lssl -lcrypto"
+-                LDFLAGS="$LDFLAGS -L$ssldir/lib"
+                 break
+             fi
+         done

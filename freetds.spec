@@ -4,36 +4,37 @@
 %bcond_without	kerberos5	# Kerberos5 support (via Heimdal)
 #
 # %%define tdsver - default protocol version; valid versions:
+# auto (default)
 # 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
 # 4.6
 # 5.0 (used by Sybase SQLServer >= 11)
-# 7.0 (used by MS SQL Server 7.0) [spec default]
+# 7.0 (used by MS SQL Server 7.0)
 # 7.1 (used by MS SQL Server 2000)
 # 7.2 (used by MS SQL Server 2005)
 # 7.3 (used by MS SQL Server 2008)
-# [7.4 (used by MS SQL Server 2012/2014) not supported yet]
-
-%{!?tdsver:%define tdsver 7.0}
+# 7.4 (used by MS SQL Server 2012/2014)
 
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	0.95.80
+Version:	1.00.13
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
 Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	aae6a130cd30fc61af4ee5de228e142c
+# Source0-md5:	5aec03ac89d3b7026acaac5b6b0aaba4
 Patch0:		%{name}-reserved.patch
 Patch1:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
+BuildRequires:	doxygen
 BuildRequires:	gettext-tools
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
-BuildRequires:	libltdl-devel
-BuildRequires:	libtool
+BuildRequires:	libltdl-devel >= 2:2
+BuildRequires:	libtool >= 2:2
 BuildRequires:	openssl-devel
+BuildRequires:	readline-devel
 BuildRequires:	unixODBC-devel
 Requires(post):	/sbin/ldconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -112,7 +113,7 @@ Sterownik ODBC FreeTDS dla unixODBC.
 	--disable-silent-rules \
 	%{?with_msdblib:--with-msdblib} \
 	--with-openssl \
-	--with-tdsver=%{tdsver} \
+	%{?tdsver:--with-tdsver=%{tdsver}} \
 	--with-unixodbc=/usr
 
 %{__make}
