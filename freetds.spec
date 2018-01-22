@@ -17,14 +17,13 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	1.00.47
+Version:	1.00.80
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
 Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	c8c126d3d6c1981a0b5169cb5df2803e
-Patch0:		%{name}-reserved.patch
-Patch1:		%{name}-no-Llibdir.patch
+# Source0-md5:	aa3e4ff3f28a9d6795c2993ba5bc3aa2
+Patch0:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -100,7 +99,6 @@ Sterownik ODBC FreeTDS dla unixODBC.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
 %{__libtoolize}
