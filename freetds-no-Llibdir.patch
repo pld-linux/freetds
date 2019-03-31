@@ -4,12 +4,12 @@
  	if test -f "$with_unixodbc/bin/odbc_config"; then
  		ODBC_CONFIG="$with_unixodbc/bin/odbc_config"
  		ODBC_INC=`$ODBC_CONFIG --include-prefix`
--		LDFLAGS="$LDFLAGS -L`$ODBC_CONFIG --lib-prefix`"
+-		ODBC_LDFLAGS="-L`$ODBC_CONFIG --lib-prefix`"
  	else
  		# if not available do not use system default
  		ODBC_CONFIG=""
  		ODBC_INC="$with_unixodbc/include"
--		LDFLAGS="$LDFLAGS -L$with_unixodbc/lib"
+-		ODBC_LDFLAGS="-L$with_unixodbc/lib"
  	fi
  	test -r "$ODBC_INC/sql.h" || AC_ERROR([sql.h not found])
  	test -r "$ODBC_INC/sqlext.h" || AC_ERROR([sqlext.h not found])
