@@ -1,14 +1,15 @@
 #
 # Conditional build:
+%bcond_with	gnutls		# GnuTLS instead of OpenSSL
 %bcond_with	msdblib		# use MS-style dblib instead of SYB-style
 %bcond_without	kerberos5	# Kerberos5 support (via Heimdal)
 #
 # %%define tdsver - default protocol version; valid versions:
 # auto (default)
-# 4.2 (used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
-# 4.6
+# 4.2 (obsolete; used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
+# 4.6 (obsolete)
 # 5.0 (used by Sybase SQLServer >= 11)
-# 7.0 (used by MS SQL Server 7.0)
+# 7.0 (too insecure; used by MS SQL Server 7.0)
 # 7.1 (used by MS SQL Server 2000)
 # 7.2 (used by MS SQL Server 2005)
 # 7.3 (used by MS SQL Server 2008)
@@ -17,22 +18,24 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	1.1.20
+Version:	1.2.5
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
 Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	eb15b86e4f146dc311abb9804c4f7646
+# Source0-md5:	15e3d9f3dcfd962809cc7eb5ecc6ef95
 Patch0:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	doxygen
 BuildRequires:	gettext-tools
+BuildRequires:	gmp-devel
+%{?with_gnutls:BuildRequires:	gnutls-devel}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	libltdl-devel >= 2:2
 BuildRequires:	libtool >= 2:2
-BuildRequires:	openssl-devel
+%{!?with_gnutls:BuildRequires:	openssl-devel}
 BuildRequires:	readline-devel
 BuildRequires:	unixODBC-devel
 Requires(post):	/sbin/ldconfig
@@ -60,8 +63,10 @@ Summary:	FreeTDS header files
 Summary(pl.UTF-8):	Pliki nagłówkowe FreeTDS
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	gmp-devel
+%{?with_gnutls:Requires:	gnutls-devel}
 %{?with_kerberos5:Requires:	heimdal-devel}
-Requires:	openssl-devel
+%{!?with_gnutls:Requires:	openssl-devel}
 
 %description devel
 FreeTDS header files.
@@ -109,8 +114,9 @@ Sterownik ODBC FreeTDS dla unixODBC.
 %configure \
 	%{?with_kerberos5:--enable-krb5=gssapi} \
 	--disable-silent-rules \
+	%{?with_gnutls:--with-gnutls} \
 	%{?with_msdblib:--with-msdblib} \
-	--with-openssl \
+	%{!?with_gnutls:--with-openssl} \
 	%{?tdsver:--with-tdsver=%{tdsver}} \
 	--with-unixodbc=/usr
 
@@ -163,7 +169,7 @@ EOF
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS* ChangeLog NEWS README* TODO* doc/userguide
+%doc AUTHORS.md BUGS.* ChangeLog NEWS.md README.* TODO.* doc/userguide
 %attr(755,root,root) %{_bindir}/bsqldb
 %attr(755,root,root) %{_bindir}/datacopy
 %attr(755,root,root) %{_bindir}/defncopy
