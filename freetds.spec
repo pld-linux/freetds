@@ -7,9 +7,9 @@
 # %%define tdsver - default protocol version; valid versions:
 # auto (default)
 # 4.2 (obsolete; used by Sybase SQLServer <= 10 and MS SQL Server 6.5)
-# 4.6 (obsolete)
+# 4.6 (obsolete, never really supported)
 # 5.0 (used by Sybase SQLServer >= 11)
-# 7.0 (too insecure; used by MS SQL Server 7.0)
+# 7.0 (obsolete, too insecure; used by MS SQL Server 7.0)
 # 7.1 (used by MS SQL Server 2000)
 # 7.2 (used by MS SQL Server 2005)
 # 7.3 (used by MS SQL Server 2008)
@@ -18,12 +18,12 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	1.2.21
-Release:	2
+Version:	1.4.26
+Release:	1
 License:	LGPL v2+
 Group:		Libraries
-Source0:	ftp://ftp.freetds.org/pub/freetds/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	f7aa1f544f16056538f3dbda5214a17b
+Source0:	https://www.freetds.org/files/stable/%{name}-%{version}.tar.bz2
+# Source0-md5:	8300e9b4b99f2d821e62ba55516d0c7f
 Patch0:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
@@ -36,6 +36,7 @@ BuildRequires:	gmp-devel
 BuildRequires:	libltdl-devel >= 2:2
 BuildRequires:	libtool >= 2:2
 %{!?with_gnutls:BuildRequires:	openssl-devel}
+BuildRequires:	pkgconfig
 BuildRequires:	readline-devel
 BuildRequires:	unixODBC-devel
 Requires(post):	/sbin/ldconfig
@@ -169,7 +170,7 @@ EOF
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS.md BUGS.* ChangeLog NEWS.md README.* TODO.* doc/userguide
+%doc AUTHORS.md ChangeLog NEWS.md README.md TODO.md Thanks-1.0 doc/userguide
 %attr(755,root,root) %{_bindir}/bsqldb
 %attr(755,root,root) %{_bindir}/datacopy
 %attr(755,root,root) %{_bindir}/defncopy
@@ -204,7 +205,6 @@ EOF
 %{_includedir}/cspublic.h
 %{_includedir}/cstypes.h
 %{_includedir}/ctpublic.h
-%{_includedir}/odbcss.h
 %{_includedir}/sqldb.h
 %{_includedir}/sqlfront.h
 %{_includedir}/sybdb.h
