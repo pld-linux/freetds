@@ -18,12 +18,12 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	1.4.26
+Version:	1.4.27
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
 Source0:	https://www.freetds.org/files/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	8300e9b4b99f2d821e62ba55516d0c7f
+# Source0-md5:	03bedbb3f92328270019f4b1bf031f29
 Patch0:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
@@ -107,6 +107,7 @@ Sterownik ODBC FreeTDS dla unixODBC.
 %patch -P0 -p1
 
 %build
+cp -pf /usr/share/gettext/m4/{iconv,lib-ld,lib-link,lib-prefix}.m4 m4
 %{__libtoolize}
 %{__aclocal} -I m4
 %{__autoconf}
@@ -178,10 +179,10 @@ EOF
 %attr(755,root,root) %{_bindir}/freebcp
 %attr(755,root,root) %{_bindir}/tdspool
 %attr(755,root,root) %{_bindir}/tsql
-%attr(755,root,root) %{_libdir}/libct.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libct.so.4
-%attr(755,root,root) %{_libdir}/libsybdb.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libsybdb.so.5
+%{_libdir}/libct.so.*.*.*
+%ghost %{_libdir}/libct.so.4
+%{_libdir}/libsybdb.so.*.*.*
+%ghost %{_libdir}/libsybdb.so.5
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/freetds.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/locales.conf
@@ -197,14 +198,15 @@ EOF
 %files devel
 %defattr(644,root,root,755)
 %doc doc/reference
-%attr(755,root,root) %{_libdir}/libct.so
-%attr(755,root,root) %{_libdir}/libsybdb.so
+%{_libdir}/libct.so
+%{_libdir}/libsybdb.so
 %{_libdir}/libct.la
 %{_libdir}/libsybdb.la
 %{_includedir}/bkpublic.h
 %{_includedir}/cspublic.h
 %{_includedir}/cstypes.h
 %{_includedir}/ctpublic.h
+%{_includedir}/odbcss.h
 %{_includedir}/sqldb.h
 %{_includedir}/sqlfront.h
 %{_includedir}/sybdb.h
@@ -221,8 +223,8 @@ EOF
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/bsqlodbc
 %attr(755,root,root) %{_bindir}/osql
-%attr(755,root,root) %{_libdir}/libtdsodbc.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libtdsodbc.so.0
-%attr(755,root,root) %{_libdir}/libtdsodbc.so
+%{_libdir}/libtdsodbc.so.*.*.*
+%ghost %{_libdir}/libtdsodbc.so.0
+%{_libdir}/libtdsodbc.so
 %{_mandir}/man1/bsqlodbc.1*
 %{_mandir}/man1/osql.1*
