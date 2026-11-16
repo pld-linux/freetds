@@ -19,7 +19,7 @@ Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
 Version:	1.5.21
-Release:	1
+Release:	2
 License:	LGPL v2+
 Group:		Libraries
 Source0:	https://www.freetds.org/files/stable/%{name}-%{version}.tar.bz2
@@ -113,7 +113,9 @@ cp -pf /usr/share/gettext/m4/{iconv,lib-ld,lib-link,lib-prefix}.m4 m4
 %{__autoconf}
 %{__autoheader}
 %{__automake}
+# odbcss.h installed by an older freetds-devel would make configure skip installing ours
 %configure \
+	ac_cv_header_odbcss_h=no \
 	%{?with_kerberos5:--enable-krb5=gssapi} \
 	--disable-silent-rules \
 	%{?with_gnutls:--with-gnutls} \
