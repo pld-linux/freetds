@@ -18,12 +18,12 @@
 Summary:	Free implementation of Sybase's db-lib
 Summary(pl.UTF-8):	Wolnodostępna implementacja db-lib firmy Sybase
 Name:		freetds
-Version:	1.4.27
+Version:	1.5.21
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
 Source0:	https://www.freetds.org/files/stable/%{name}-%{version}.tar.bz2
-# Source0-md5:	03bedbb3f92328270019f4b1bf031f29
+# Source0-md5:	16bb2d3378c948996abe7ee30aa2e2d9
 Patch0:		%{name}-no-Llibdir.patch
 URL:		http://www.freetds.org/
 BuildRequires:	autoconf >= 2.53
@@ -157,14 +157,14 @@ fi
 /usr/bin/odbcinst -i -d -r <<EOF
 [FreeTDS]
 Description = FreeTDS unixODBC Driver
-Driver = %{_libdir}/libtdsodbc.so.0
-Setup = %{_libdir}/libtdsodbc.so.0
+Driver = %{_libdir}/libtdsodbc.so
+Setup = %{_libdir}/libtdsodbc.so
 EOF
 /usr/bin/odbcinst -i -d -r <<EOF
 [SQL Server]
 Description = FreeTDS unixODBC Driver
-Driver = %{_libdir}/libtdsodbc.so.0
-Setup = %{_libdir}/libtdsodbc.so.0
+Driver = %{_libdir}/libtdsodbc.so
+Setup = %{_libdir}/libtdsodbc.so
 EOF
 
 %postun odbc -p /sbin/ldconfig
@@ -223,8 +223,6 @@ EOF
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/bsqlodbc
 %attr(755,root,root) %{_bindir}/osql
-%{_libdir}/libtdsodbc.so.*.*.*
-%ghost %{_libdir}/libtdsodbc.so.0
 %{_libdir}/libtdsodbc.so
 %{_mandir}/man1/bsqlodbc.1*
 %{_mandir}/man1/osql.1*
