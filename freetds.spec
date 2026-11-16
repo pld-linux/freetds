@@ -63,11 +63,11 @@ skończony, ale może działać w zależności od potrzeb.
 Summary:	FreeTDS header files
 Summary(pl.UTF-8):	Pliki nagłówkowe FreeTDS
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	gmp-devel
-%{?with_gnutls:Requires:	gnutls-devel}
-%{?with_kerberos5:Requires:	heimdal-devel}
-%{!?with_gnutls:Requires:	openssl-devel}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	gmp-devel%{?_isa}
+%{?with_gnutls:Requires:	gnutls-devel%{?_isa}}
+%{?with_kerberos5:Requires:	heimdal-devel%{?_isa}}
+%{!?with_gnutls:Requires:	openssl-devel%{?_isa}}
 
 %description devel
 FreeTDS header files.
@@ -79,7 +79,7 @@ Pliki nagłówkowe FreeTDS.
 Summary:	FreeTDS static libraries
 Summary(pl.UTF-8):	Statyczne biblioteki FreeTDS
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
+Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
 
 %description static
 FreeTDS static libraries.
@@ -93,8 +93,8 @@ Summary(pl.UTF-8):	Sterownik ODBC FreeTDS dla unixODBC
 Group:		Libraries
 Requires(post):	/sbin/ldconfig
 Requires(post):	/usr/bin/odbcinst
-Requires:	%{name} = %{version}-%{release}
-Requires:	unixODBC
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	unixODBC%{?_isa}
 
 %description odbc
 FreeTDS ODBC driver for unixODBC.
